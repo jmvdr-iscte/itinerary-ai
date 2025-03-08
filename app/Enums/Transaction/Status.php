@@ -2,11 +2,12 @@
 
 namespace App\Enums\Transaction;
 
-enum Status
+enum Status: string
 {
-	const PENDING = 'PENDING';
-	const PENDING_PAYMENT = 'PENDING_PAYMENT';
-	const COMPLETED = 'COMPLETED';
-	const FAILED = 'FAILED';
-	const CANCELED = 'CANCELED';
+	case PENDING = 'PENDING';
+	case PENDING_PAYMENT = 'PENDING_PAYMENT';
+	case PROCESSING = 'PROCESSING';
+	case COMPLETED = 'COMPLETED';
+	case FAILED = 'FAILED';
+	case CANCELED = 'CANCELED';
 }

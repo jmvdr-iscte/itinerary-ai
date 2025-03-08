@@ -2,8 +2,8 @@
 
 namespace App\Enums\Product;
 
-enum Status
+enum Status: string
 {
-	const ACTIVE = 'ACTIVE';
-	const INACTIVE = 'INACTIVE';
+	case ACTIVE = 'ACTIVE';
+	case INACTIVE = 'INACTIVE';
 }

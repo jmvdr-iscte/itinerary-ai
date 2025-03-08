@@ -16,7 +16,6 @@ return new class extends Migration
             $table->id();
             $table->string('uid')->unique();
 			$table->enum('status', array_map(fn($case) => $case->value, EStatus::cases()));
-            $table->timestamps();
             $table->integer('value');
             $table->string('currency');
             $table->string('name');

@@ -20,9 +20,12 @@ return new class extends Migration
 			$table->string('currency');
 			$table->string('method');
 			$table->string('gateway');
+			$table->string('email');
+            $table->unsignedBigInteger('product_id');
 			$table->foreign('product_id')->references('id')->on('transactions.products');
 			$table->string('country')->nullable(true);
 			$table->string('gateway_reference')->nullable(true);
+            $table->string('promo_code')->nullable(true);
 			$table->json('metadata')->nullable(true);
 			$table->timestamps();
 		});
