@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Http\Requests\ItineraryRequest;
 use Illuminate\Http\JsonResponse;
 use App\Services\AIService;
+use App\Services\Maps;
+use Illuminate\Support\Facades\Log;
 
 class ServerController extends Controller
 {
@@ -18,6 +20,7 @@ class ServerController extends Controller
 	{
 		//init
 		$ai_service = new AIService();
+		$maps_service = new Maps();
 
 		$body = $request->validated();
 
@@ -28,8 +31,18 @@ class ServerController extends Controller
 			$body['destination'],
 			$body['categories'],
 			$body['transportation'],
-			$body['number_of_people'],
+			$body['number_of_people']
 		);
-		return response()->json([$body]);
+
+        foreach ($itinerary as $day => $details) {
+            if (!isset($details['places'])) {
+                continue;
+            }
+            Log::info('Places ', $details['places']);
+
+            $itinerary[$day]['places'] = $maps_service->getRoutes($body['origin'], $details['places']);
+        }
+
+		return response()->json([$itinerary]);
 	}
 }
