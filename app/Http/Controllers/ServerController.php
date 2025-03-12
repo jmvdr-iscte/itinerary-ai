@@ -7,7 +7,8 @@ use Illuminate\Http\JsonResponse;
 use App\Services\AIService;
 use App\Services\Maps;
 use Illuminate\Support\Facades\Log;
-
+use Illuminate\Support\Facades\Mail;
+use App\Services\Email;
 class ServerController extends Controller
 {
 
@@ -43,6 +44,8 @@ class ServerController extends Controller
             $itinerary[$day]['places'] = $maps_service->getRoutes($body['origin'], $details['places']);
         }
 
-		return response()->json([$itinerary]);
+        Mail::to($body['email'])->send(new Email($itinerary));
+
+		return response()->json(['status' => 'ok']);
 	}
 }
