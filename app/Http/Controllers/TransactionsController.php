@@ -15,7 +15,7 @@ class TransactionsController extends Controller
 
 	final public function getTransaction(string $uid): JsonResponse
 	{
-		return response()->json([]);
+
 	}
 
 	final public function createTransaction(Request $request): JsonResponse

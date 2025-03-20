@@ -35,6 +35,8 @@ class ItineraryRequest extends FormRequest
 			'origin' => ['required', 'string', 'max:255'],
 			'from' => ['required', 'date', 'date_format:Y-m-d\TH:i:sP'],
 			'to' => ['required', 'date', 'date_format:Y-m-d\TH:i:sP', 'after:from'],
+            'budget' => ['required', 'numeric', 'min:0', 'max:1000000'],
+            'currency' => ['required', 'string', 'size:3'],
 		];
 	}
 }

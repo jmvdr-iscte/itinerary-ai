@@ -26,6 +26,7 @@ return new class extends Migration
 			$table->string('country')->nullable(true);
 			$table->string('gateway_reference')->nullable(true);
             $table->string('promo_code')->nullable(true);
+			$table->foreign('itinerary_id')->references('id')->on('itinerary.ititnerary');
 			$table->json('metadata')->nullable(true);
 			$table->timestamps();
 		});

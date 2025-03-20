@@ -36,13 +36,13 @@ final class AIService
 
 
 	final public function getItinerary(
-		string $origin,
 		string $from,
 		string $to,
 		string $destination,
 		array $categories,
 		array $transportation,
-		int $people_number
+		int $people_number,
+        int $budget
 	): ?array
 	{
 		$response = $this->getClient()->chat()->create([
@@ -59,7 +59,7 @@ final class AIService
 			],
 			[
 				'role' => 'user',
-				'content' => "Plan a trip starting on {$from} and ending on {$to} to {$destination}.
+				'content' => "Plan a trip starting on {$from} and ending on {$to} to {$destination} with a maximum of {$budget} $.
 					Return ONLY a JSON object with days as keys and list of places per day. Regarding food, prioritize local restaurants.
 					And the first and last days should not be as busy as the rest.
 					The nightlife activities should be planed only at the end of the day.
@@ -71,7 +71,7 @@ final class AIService
 		],
 		'response_format' => ['type' => 'json_object'],
 		'temperature' => 0.1,
-		'max_tokens' => 1000
+		'max_tokens' => 10000
 	]);
 
 		$itinerary = json_decode($response['choices'][0]['message']['content'], true) ?? null;

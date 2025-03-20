@@ -26,13 +26,13 @@ class ServerController extends Controller
 		$body = $request->validated();
 
 		$itinerary = $ai_service->getItinerary(
-			$body['origin'],
 			$body['from'],
 			$body['to'],
 			$body['destination'],
 			$body['categories'],
 			$body['transportation'],
-			$body['number_of_people']
+			$body['number_of_people'],
+            $body['budget']
 		);
 
         foreach ($itinerary as $day => $details) {
