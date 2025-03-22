@@ -3,10 +3,11 @@
 namespace App\Gateways;
 
 use App\Models\Transaction;
-use Google\Service\BinaryAuthorization\Check;
+use Illuminate\Support\Facades\Log;
 use Stripe\StripeClient;
 use Stripe\Checkout\Session as CheckoutSession;
-
+use App\Enums\Transaction\Status as EStatus;
+use Stripe\PaymentIntent;
 
 final class Stripe
 {
@@ -72,6 +73,56 @@ final class Stripe
         ]);
 
         return $checkout;
+    }
+
+    /**
+     * Get the payment notification.
+     *
+     * @param string $payment_intent
+     * The payment intent to get.
+     *
+     * @throws \Exception
+     *
+     * @return \Stripe\PaymentIntent
+     * The payment intent.
+     */
+    final public function getPaymentNotification(string $payment_intent): PaymentIntent
+    {
+        $client = self::getClient();
+
+        try{
+            $payment = $client->paymentIntents->retrieve($payment_intent);
+        } catch (\Exception $e) {
+            Log::error('Invalid payment intent', ['payment_intent' => $payment]);
+            throw new \Exception('Invalid payment intent');
+        }
+        return $payment;
+    }
+
+
+    //public static functions
+    /**
+     * Map the Stripe status to the internal status.
+     *
+     * @param string $stripeStatus
+     * The Stripe status to map.
+     *
+     * @return EStatus
+     * The internal status.
+     */
+    public static function mapStripeStatusToInternalStatus(string $stripeStatus): EStatus
+    {
+        return match ($stripeStatus) {
+            'requires_payment_method' => EStatus::PENDING_PAYMENT,
+            'requires_confirmation' => EStatus::PENDING_PAYMENT,
+            'requires_action' => EStatus::PENDING_PAYMENT,
+            'processing' => EStatus::PROCESSING,
+            'requires_capture' => EStatus::PROCESSING,
+            'succeeded' => EStatus::COMPLETED,
+            'canceled' => EStatus::CANCELED,
+            default => EStatus::FAILED,
+
+        };
     }
 
 

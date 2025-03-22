@@ -35,4 +35,10 @@ class Itinerary extends Model
         'to' => 'datetime',
         'budget' => 'decimal:2',
     ];
+
+
+    public function isClosed(): bool
+    {
+        return in_array($this->status, ['COMPLETED', 'FAILED', 'CANCELLED'], true);
+    }
 }

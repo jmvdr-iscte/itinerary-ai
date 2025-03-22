@@ -19,3 +19,5 @@ Route::middleware('api_key')->group(function () {
 Route::post('/transactions', [TransactionsController::class, 'createTransaction']);
 
 Route::get("/transactions/{uid}", [TransactionsController::class, 'getTransaction']);
+
+Route::post('/transaction-callback/stripe', [TransactionsController::class, 'handleCallback']);

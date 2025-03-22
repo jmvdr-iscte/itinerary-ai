@@ -45,4 +45,10 @@ class Transaction extends Model
     {
         return $this->belongsTo(Itinerary::class, 'itinerary_id', 'id');
     }
+
+
+    public function isClosed(): bool
+    {
+        return in_array($this->status,['COMPLETED', 'FAILED', 'CANCELLED'], true);
+    }
 }
