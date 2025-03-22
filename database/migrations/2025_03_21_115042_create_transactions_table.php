@@ -14,19 +14,19 @@ return new class extends Migration
 	{
 		Schema::create('transactions.transactions', function (Blueprint $table) {
 			$table->id();
-			$table->string('uid')->unique();
+			$table->uuid('uid');
 			$table->enum('status', array_map(fn($case) => $case->value, EStatus::cases()));
 			$table->string('value');
 			$table->string('currency');
 			$table->string('method');
 			$table->string('gateway');
-			$table->string('email');
             $table->unsignedBigInteger('product_id');
 			$table->foreign('product_id')->references('id')->on('transactions.products');
 			$table->string('country')->nullable(true);
 			$table->string('gateway_reference')->nullable(true);
             $table->string('promo_code')->nullable(true);
-			$table->foreign('itinerary_id')->references('id')->on('itinerary.ititnerary');
+            $table->unsignedBigInteger('itinerary_id');
+			$table->foreign('itinerary_id')->references('id')->on('itinerary.itinerary');
 			$table->json('metadata')->nullable(true);
 			$table->timestamps();
 		});

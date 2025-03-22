@@ -14,7 +14,7 @@ return new class extends Migration
 	{
 		Schema::create('itinerary.itinerary', function (Blueprint $table) {
             $table->id();
-            $table->string('uid')->unique();
+            $table->uuid('uid');
             $table->enum('status', array_map(fn($case) => $case->value, EStatus::cases()));
             $table->string('email');
             $table->json('itinerary');

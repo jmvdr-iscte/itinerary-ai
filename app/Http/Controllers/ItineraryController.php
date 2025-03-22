@@ -2,17 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use App\Http\Requests\ItineraryRequest;
 use App\Services\AIService;
 use App\Services\Maps;
-use Illuminate\Support\Facades\Log;
 use App\Models\Itinerary;
+use Illuminate\Support\Str;
 
 class ItineraryController extends Controller
 {
-
     final public function createItinerary(ItineraryRequest $request): JsonResponse
     {
 		//init
@@ -40,7 +38,7 @@ class ItineraryController extends Controller
         }
 
        $itinerary = Itinerary::create([
-            'uid' => uniqid(),
+            'uid' => Str::uuid(),
             'status' => 'CREATED',
             'email' => $body['email'],
             'itinerary' => $itinerary,
@@ -55,11 +53,8 @@ class ItineraryController extends Controller
             'currency' => $body['currency'],
         ]);
 
-        //TODO:create transaction
-
-
         return response()->json([
             'uid' => $itinerary->uid,
-        ]);
+        ], 201);
     }
 }

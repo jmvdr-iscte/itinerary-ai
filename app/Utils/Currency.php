@@ -1,8 +1,10 @@
 <?php
 
+namespace App\Utils;
+
 final class Currency
 {
-    final public function isSupportedCurrency(string $currency): bool
+    final public static function isSupportedCurrency(string $currency): bool
     {
         $supportedCurrencies = [
             'USD',
