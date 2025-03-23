@@ -1,0 +1,28 @@
+<svg width="240" height="60" viewBox="0 0 240 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Pin Shape -->
+  <path d="M30 55C30 55 50 35 50 20C50 8.9543 41.0457 0 30 0C18.9543 0 10 8.9543 10 20C10 35 30 55 30 55Z" fill="url(#paint0_linear)"/>
+  
+  <!-- Wave inside pin -->
+  <path d="M22 20C24.6667 17.3333 27.3333 17.3333 30 20C32.6667 22.6667 35.3333 22.6667 38 20" stroke="white" stroke-width="3" stroke-linecap="round"/>
+  
+  <!-- Text "Trip" -->
+  <path d="M70 35V15H90M75 20H85" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M95 35V15H100L110 30V15H115V35H110L100 20V35H95Z" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M120 35V15H125V30H135V35H120Z" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M140 35V30L155 15H140V10H165V15L150 30H165V35H140Z" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+  
+  <!-- Text "Flow" -->
+  <path d="M170 35V15H185C188.314 15 191 17.6863 191 21C191 24.3137 188.314 27 185 27H170" stroke="#8B5CF6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M175 21H185" stroke="#8B5CF6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+  
+  <path d="M195 15H210V20H200V22.5H208V27.5H200V35H195V15Z" stroke="#8B5CF6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M215 35V15H220L230 25V15H235V35H230L220 25V35H215Z" stroke="#8B5CF6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+  
+  <!-- Gradient definitions -->
+  <defs>
+    <linearGradient id="paint0_linear" x1="10" y1="0" x2="50" y2="55" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#A78BFA"/>
+      <stop offset="1" stop-color="#8B5CF6"/>
+    </linearGradient>
+  </defs>
+</svg>

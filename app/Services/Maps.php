@@ -118,6 +118,7 @@ class Maps
 			$data = $response->json();
 
 			if (!isset($data['routes'][0]['optimizedIntermediateWaypointIndex'])) {
+                Log::error('Google API did not return optimized waypoint order.', ['response' => $response]);
 				throw new \Exception('Google API did not return optimized waypoint order.');
 			}
 

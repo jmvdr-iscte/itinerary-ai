@@ -43,10 +43,19 @@ final class Stripe
      * @param string $cancel_url
      * The cancel URL.
      *
+     * @param string $itinerary_id
+     * The itinerary ID.
+     *
      * @param Transaction $transaction
      * The transaction to execute.
+     *
+     * @param string $email
+     * The email to send the receipt to.
+     *
+     * @return CheckoutSession
+     * The checkout session.
      */
-    final public function executeCheckout(string $success_url, string $cancel_url, string $itinerary_id, Transaction $transaction): CheckoutSession
+    final public function executeCheckout(string $success_url, string $cancel_url, string $itinerary_id, Transaction $transaction, string $email): CheckoutSession
     {
         $client = self::getClient();
         $checkout = $client->checkout->sessions->create([
@@ -69,7 +78,8 @@ final class Stripe
             'metadata' => [
                 'transaction_id' => $transaction->id,
                 'ititnerary_id' => $itinerary_id,
-            ]
+            ],
+            'customer_email' => $email
         ]);
 
         return $checkout;

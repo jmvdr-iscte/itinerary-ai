@@ -59,7 +59,7 @@ class TransactionsController extends Controller
 		}
 
 		//TODO: validate currency
-		$currency = Currency::isSupportedCurrency($body['currency']);
+		$currency = Currency::isSupportedCurrency($product->currency);
 
 		if (!$currency) {
 			//create error response
@@ -72,8 +72,8 @@ class TransactionsController extends Controller
 				'uid' => Str::uuid(),
 				'itinerary_id' => $itinerary->id,
 				'product_id' => $product->id,
-				'currency' => $body['currency'],
-				'value' => $body['value'],
+				'currency' => $product->currency,
+				'value' => $product->value / 1000, //TODO to ficx,
 				'method' => $body['method'],
 				'gateway' => $body['gateway'],
 				'country' => $body['country'] ?? 'ZZ',
@@ -82,7 +82,7 @@ class TransactionsController extends Controller
 				'status' => 'PENDING_PAYMENT'
 			]);
 
-		$checkout_session = $gateway->executeCheckout($body['success_url'], $body['cancel_url'], $itinerary->id, $transaction);
+		$checkout_session = $gateway->executeCheckout($body['success_url'], $body['cancel_url'], $itinerary->id, $transaction, $itinerary->email);
 
 
 		return response()->json([
@@ -145,7 +145,7 @@ class TransactionsController extends Controller
                     $itinerary = Itinerary::where('uid', $itinerary_uid)->first();
 				    if ($itinerary !== null && !$itinerary->isClosed()) {
                         try {
-                        Mail::to($itinerary->email)->send(new Email($itinerary->itinerary));
+                            Mail::to($itinerary->email)->queue(new Email($itinerary->itinerary));
                         } catch (\Exception $e) {
                             $itinerary->status = 'FAILED';
                             $itinerary->save();

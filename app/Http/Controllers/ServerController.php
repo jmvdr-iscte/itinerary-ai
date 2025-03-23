@@ -44,7 +44,7 @@ class ServerController extends Controller
             $itinerary[$day]['places'] = $maps_service->getRoutes($body['origin'], $details['places']);
         }
 
-        Mail::to($body['email'])->send(new Email($itinerary));
+        Mail::to($body['email'])->queue(new Email($itinerary));
 
 		return response()->json(['status' => 'ok']);
 	}
