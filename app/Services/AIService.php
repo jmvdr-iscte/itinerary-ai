@@ -35,44 +35,94 @@ final class AIService
 
 
 
-	final public function getItinerary(
-		string $from,
-		string $to,
-		string $destination,
-		array $categories,
-		array $transportation,
-		int $people_number,
-        int $budget
-	): ?array
-	{
-		$response = $this->getClient()->chat()->create([
-		'model' => 'gpt-4o',
-		'messages' => [
-			[
-				'role' => 'system',
-				'content' => 'You are a travel agent. Generate a JSON object where keys are "day 1", "day 2", etc., and values are ordered arrays of place names.
-					Provide a quick description inside each json object where the key is "description". Also include the transportation more fitted to the day.
-					Prioritize local restaurants.
-					Categories to include: ' . implode(', ', $categories) . '.
-					Transportation modes: ' . implode(', ', $transportation) . '.
-					Order places to minimize travel time for a group of ' . $people_number . ' people.'
-			],
-			[
-				'role' => 'user',
-				'content' => "Plan a trip starting on {$from} and ending on {$to} to {$destination} with a maximum of {$budget} $.
-					Return ONLY a JSON object with days as keys and list of places per day. Regarding food, prioritize local restaurants.
-					And the first and last days should not be as busy as the rest.
-					The nightlife activities should be planed only at the end of the day.
-					The places should be in a format of name, address.
-					If name, address is not possible, just use name, city.
-					When selecting a place bear in mind the usual weather conditions at the time.
-					Do not repeat places."
-			],
-		],
-		'response_format' => ['type' => 'json_object'],
-		'temperature' => 0.1,
-		'max_tokens' => 10000
-	]);
+    final public function getItinerary(
+        string $from,
+        string $to,
+        string $destination,
+        array $categories,
+        array $transportation,
+        int $people_number,
+        int $budget,
+        ?array $activity_pace = null,
+        ?array $must_see_attractions = null
+    ): ?array
+    {
+        $response = $this->getClient()->chat()->create([
+            'model' => 'gpt-4o',
+            'messages' => [
+                [
+                    'role' => 'system',
+                    'content' => 'You are an expert travel planner. When creating an itinerary, consider all these detailed factors:
+
+    - Time slots for each activity (morning, afternoon, evening)
+    - Activity types (breakfast, lunch, dinner, sightseeing, museums, etc.)
+    - Estimated costs for budgeting purposes
+    - Transportation methods between locations
+    - Weather considerations for the time period
+    - Logical geographical flow to minimize travel time
+    - Group size and dynamics
+    - Spacing meals appropriately throughout the day
+    - Including at least 3 meals daily prioritizing local restaurants
+    - Planning 2-3 activities per day at an appropriate pace
+    - Including evening entertainment where culturally appropriate
+
+    However, your response should ONLY include a simplified JSON with days as keys, and for each day:
+    1. An array of "places" with name and address
+    2. A "description" summarizing the day\'s activities
+    3. The transportation method for the day, from the transportation options provided.
+
+    Categories to focus on: ' . implode(', ', $categories) . '.
+    Transportation available: ' . implode(', ', $transportation) . '.
+    Group size: ' . $people_number . ' people.
+    Total budget: $' . $budget . ' for the entire trip.' .
+    'Activity pace preference: ' . (!empty($activity_pace) ? implode(', ', $activity_pace) : 'moderate') . '.
+    Must-see attractions: ' . (!empty($must_see_attractions) ? implode(', ', $must_see_attractions) : 'traveler has not specified any must-see attractions')
+
+                ],
+                [
+                    'role' => 'user',
+                    'content' => "Plan a well-thought-out itinerary from {$from} to {$to} in {$destination} with a maximum budget of {$budget}.
+
+    Use all your expertise to consider:
+    1. First and last days should have fewer activities for travel logistics
+    2. Include breakfast, lunch, and dinner options prioritizing authentic local restaurants in every day
+    3. Plan a logical geographical sequence to minimize travel time
+    4. Account for weather conditions during this period
+    5. Balance indoor and outdoor activities
+    6. Include cultural, historical, and local experiences
+    7. Consider advance booking requirements for popular attractions
+
+    However, return ONLY a simplified JSON in exactly this format:
+
+    ```json
+    {
+      \"day 1\": {
+        \"places\": [
+          {
+            \"address\": \"Full address or Name, City\"
+          },
+          {
+            \"address\": \"Another address\"
+          }
+        ],
+        \"description\": \"Summary of day 1 activities and highlights.\",
+        \"transportation\": \"CAR\"
+      },
+      \"day 2\": {
+        \"places\": [
+          ...
+        ],
+        \"description\": \"Summary of day 2.\",
+        \"transportation\": \"WALK\"
+            }
+            }The returned JSON must strictly follow this format to be processed correctly."
+        ],
+        ],
+
+            'response_format' => ['type' => 'json_object'],
+            'temperature' => 0.1,
+            'max_tokens' => 10000
+        ]);
 
 		$itinerary = json_decode($response['choices'][0]['message']['content'], true) ?? null;
 

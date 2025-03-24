@@ -7,6 +7,7 @@ use App\Http\Requests\ItineraryRequest;
 use App\Services\AIService;
 use App\Services\Maps;
 use App\Models\Itinerary;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 class ItineraryController extends Controller
@@ -30,11 +31,16 @@ class ItineraryController extends Controller
 		);
 
         foreach ($itinerary as $day => $details) {
-            if (!isset($details['places'])) {
-                throw new \Exception('Invalid places.');
+            if (!isset($details['places']) || !is_array($details['places'])) {
+                Log::error('Invalid places.', $day, $details);
+                continue;
             }
 
-            $itinerary[$day]['places'] = $maps_service->getRoutes($body['origin'], $details['places']);
+            $addresses = array_map(function($place) {
+                return $place['address'];
+            }, $details['places']);
+
+            $itinerary[$day]['places'] = $maps_service->getRoutes($body['origin'], $addresses, $itinerary[$day]['transportation']);
         }
 
        $itinerary = Itinerary::create([

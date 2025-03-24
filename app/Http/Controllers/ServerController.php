@@ -25,6 +25,7 @@ class ServerController extends Controller
 
 		$body = $request->validated();
 
+        //TODO: Add pacing and sights to see
 		$itinerary = $ai_service->getItinerary(
 			$body['from'],
 			$body['to'],
@@ -36,16 +37,22 @@ class ServerController extends Controller
 		);
 
         foreach ($itinerary as $day => $details) {
-            if (!isset($details['places'])) {
+            if (!isset($details['places']) || !is_array($details['places'])) {
+                Log::error('Invalid places.', $day, $details);
                 continue;
             }
-            Log::info('Places ', $details['places']);
 
-            $itinerary[$day]['places'] = $maps_service->getRoutes($body['origin'], $details['places']);
+            $addresses = array_map(function($place) {
+                return $place['address'];
+            }, $details['places']);
+
+            $itinerary[$day]['places'] = $maps_service->getRoutes($body['origin'], $addresses, $itinerary[$day]['transportation']);
         }
 
-        Mail::to($body['email'])->queue(new Email($itinerary));
+        Mail::to($body['email'])->send(new Email($itinerary));
 
-		return response()->json(['status' => 'ok']);
+		return response()->json([
+            'itinerary' => $itinerary,
+        ]);
 	}
 }
