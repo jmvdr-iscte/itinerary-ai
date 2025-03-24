@@ -6,6 +6,7 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use App\Enums\Itinerary\Transportation as ETransportation;
 use App\Enums\Itinerary\Category as ECategory;
+use App\Enums\Itinerary\ActivityPace as EActivityPace;
 
 class ItineraryRequest extends FormRequest
 {
@@ -37,6 +38,8 @@ class ItineraryRequest extends FormRequest
 			'to' => ['required', 'date', 'date_format:Y-m-d\TH:i:sP', 'after:from'],
             'budget' => ['required', 'numeric', 'min:0', 'max:1000000'],
             'currency' => ['required', 'string', 'size:3'],
+            'activity_pace' => ['nullable', 'string',Rule::in(array_map(fn($case) => $case->value, EActivityPace::cases()))],
+            'must_see_attractions' => ['nullable', 'array', 'min:1'],
 		];
 	}
 }

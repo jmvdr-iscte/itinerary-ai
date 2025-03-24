@@ -25,7 +25,6 @@ class ServerController extends Controller
 
 		$body = $request->validated();
 
-        //TODO: Add pacing and sights to see
 		$itinerary = $ai_service->getItinerary(
 			$body['from'],
 			$body['to'],
@@ -33,7 +32,9 @@ class ServerController extends Controller
 			$body['categories'],
 			$body['transportation'],
 			$body['number_of_people'],
-            $body['budget']
+            $body['budget'],
+            $body['activity_pace'] ?? null,
+            $body['must_see_attractions'] ?? null
 		);
 
         foreach ($itinerary as $day => $details) {

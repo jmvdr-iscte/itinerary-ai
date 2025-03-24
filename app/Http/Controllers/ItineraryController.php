@@ -27,7 +27,9 @@ class ItineraryController extends Controller
 			$body['categories'],
 			$body['transportation'],
 			$body['number_of_people'],
-            $body['budget']
+            $body['budget'],
+            $body['activity_pace'] ?? null,
+            $body['must_see_attractions'] ?? null
 		);
 
         foreach ($itinerary as $day => $details) {
