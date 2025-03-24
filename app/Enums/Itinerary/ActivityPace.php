@@ -4,7 +4,7 @@ namespace App\Enums\Itinerary;
 
 enum ActivityPace: string
 {
-	case LOW = 'LOW';
+	case SLOW = 'SLOW';
 	case MODERATE = 'MODERATE';
-	case HIGH = 'HIGH';
+	case FAST = 'FAST';
 }
