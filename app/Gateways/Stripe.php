@@ -58,7 +58,7 @@ final class Stripe
     final public function executeCheckout(string $success_url, string $cancel_url, string $itinerary_id, Transaction $transaction, string $email): CheckoutSession
     {
         $client = self::getClient();
-        $checkout = $client->checkout->sessions->create([
+        $checkout_body = [
             'success_url' => $success_url,
             'cancel_url' => $cancel_url,
             'payment_method_types' => [self::processPaymentMethods($transaction->method)],
@@ -78,9 +78,12 @@ final class Stripe
             'metadata' => [
                 'transaction_id' => $transaction->id,
                 'ititnerary_id' => $itinerary_id,
-            ],
-            'customer_email' => $email
-        ]);
+            ]
+        ];
+        if ($transaction->method === 'credit_card') {
+            $checkout_body['customer_email'] = $email;
+        }
+        $checkout = $client->checkout->sessions->create($checkout_body);
 
         return $checkout;
     }

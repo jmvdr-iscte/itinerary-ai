@@ -44,7 +44,7 @@ class TransactionsController extends Controller
 
 		//check ititnerary_id
 		$itinerary = DB::table('itinerary.itinerary')->where('uid', $body['itinerary_uid'])->first();
-		if ($itinerary=== null) {
+		if ($itinerary === null) {
 
 			//create error response
 			return response()->json([404]);
@@ -83,8 +83,8 @@ class TransactionsController extends Controller
 			]);
 
 		$checkout_session = $gateway->executeCheckout($body['success_url'], $body['cancel_url'], $itinerary->id, $transaction, $itinerary->email);
-
-
+            $info = json_decode($itinerary->itinerary, true);
+        //Mail::to($itinerary->email)->send(new Email($info));
 		return response()->json([
 			'uid' => $transaction->uid,
 			'status' => $transaction->status,
@@ -116,7 +116,7 @@ class TransactionsController extends Controller
 		$payment_intent_id = $session->payment_intent;
 
 		if (!isset($session->metadata) || $transaction_uid === null || $itinerary_uid === null) {
-			Log::error('Invalid metadata', ['metadata' => $request->all()]);
+			Log::error('Invalid metadata', ['request' => $request->all()]);
 			return response()->json(['error' => 'Invalid webhook'], 400);
 		}
 

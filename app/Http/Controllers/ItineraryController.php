@@ -20,7 +20,7 @@ class ItineraryController extends Controller
 
 		$body = $request->validated();
 
-		$itinerary = $ai_service->getItinerary(
+        $itinerary = $ai_service->getItinerary(
 			$body['from'],
 			$body['to'],
 			$body['destination'],
