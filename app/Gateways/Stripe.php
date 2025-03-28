@@ -149,6 +149,7 @@ final class Stripe
      *
      * @return string
      * The processed payment method.
+     *
      * @throws \Exception
      */
     private function processPaymentMethods(string $payment_method): string

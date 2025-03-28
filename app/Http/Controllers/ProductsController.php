@@ -6,7 +6,9 @@ use App\Http\Requests\CreateProduct;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Models\Product;
+use App\Utils\Currency;
 use Illuminate\Support\Str;
+use App\Services\Client;
 
 class ProductsController extends Controller
 {
@@ -25,6 +27,25 @@ class ProductsController extends Controller
 
 		return response()->json([], 201);
     }
+
+    final public function getProduct(Request $request): JsonResponse
+    {
+        $region = Client::getClientRegion($request);
+        $currency = Currency::isSupportedCurrency($region['currency']) ? $region['currency'] : 'USD';
+
+        $product = Product::where('currency', $currency)
+            ->where('status', 'ACTIVE')
+            ->first();
+
+        if ($product === null) {
+            return response()->json(['result' => 'Product not found'], 404);
+        }
+
+        //return
+        return response()->json($product->makeHidden(['id']));
+    }
+
+
 
 	final public function updateProduct(string $uid, Request $request): JsonResponse
 	{

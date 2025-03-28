@@ -21,3 +21,5 @@ Route::post('/transactions', [TransactionsController::class, 'createTransaction'
 Route::get("/transactions/{uid}", [TransactionsController::class, 'getTransaction']);
 
 Route::post('/transaction-callback/stripe', [TransactionsController::class, 'handleCallback']);
+
+Route::get('/product', [ProductsController::class, 'getProduct']);

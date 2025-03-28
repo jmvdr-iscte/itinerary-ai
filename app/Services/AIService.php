@@ -14,9 +14,6 @@ final class AIService
 	 */
 	private $client = null;
 
-	//TODO: add prompt
-	protected static $constant = 'prompt';
-
 
 
 	/**
