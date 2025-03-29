@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Log;
 use Stripe\StripeClient;
 use Stripe\Checkout\Session as CheckoutSession;
 use App\Enums\Transaction\Status as EStatus;
+use App\Models\Product;
 use Stripe\PaymentIntent;
 
 final class Stripe
@@ -34,6 +35,7 @@ final class Stripe
     }
 
 
+
     /**
      * Execute the checkout.
      *
@@ -55,7 +57,14 @@ final class Stripe
      * @return CheckoutSession
      * The checkout session.
      */
-    final public function executeCheckout(string $success_url, string $cancel_url, string $itinerary_id, Transaction $transaction, string $email): CheckoutSession
+    final public function executeCheckout(
+        string $success_url,
+        string $cancel_url,
+        string $itinerary_id,
+        Transaction $transaction,
+        string $email,
+        Product $product
+    ): CheckoutSession
     {
         $client = self::getClient();
         $checkout_body = [
@@ -67,9 +76,9 @@ final class Stripe
                     'price_data' => [
                         'currency' => $transaction->currency,
                         'product_data' => [
-                            'name' => 'Itinerary',
+                            'name' => $product->name,
                         ],
-                        'unit_amount' => $transaction->value * 100, //TODO: change
+                        'unit_amount' => $product->value,
                     ],
                     'quantity' => 1,
                 ],
@@ -135,6 +144,28 @@ final class Stripe
             'canceled' => EStatus::CANCELED,
             default => EStatus::FAILED,
 
+        };
+    }
+
+    /**
+     * Normalize the price based on the currency.
+     *
+     * @param int $price
+     * The price to normalize.
+     *
+     * @param string $currency
+     * The currency to normalize to.
+     *
+     * @return string
+     * The normalized price.
+     */
+    public static function normalizePrice(int $price, string $currency): string
+    {
+        return match($currency) {
+            'USD' => number_format($price, 2, '.', ''),
+            'EUR' => number_format($price, 2, ',', ''),
+            'GBP' => number_format($price, 2, ',', ''),
+            default => number_format($price, 2, '.', ''),
         };
     }
 

@@ -15,6 +15,8 @@ use Stripe\Webhook;
 use Illuminate\Support\Facades\Mail;
 use App\Services\Email;
 use App\Models\Itinerary;
+use App\Utils\Price;
+use App\Models\Product;
 
 class TransactionsController extends Controller
 {
@@ -35,37 +37,39 @@ class TransactionsController extends Controller
 	   return response()->json($transaction->makeHidden(['id', 'itinerary_id', 'product_id', 'promo_code', 'gateway_reference']));
 	}
 
-
-
 	final public function createTransaction(CreateTransactionRequest $request): JsonResponse
 	{
-		$gateway= new Gateway();
+		$gateway = new Gateway();
 		$body = $request->validated();
 
 		//check ititnerary_id
 		$itinerary = DB::table('itinerary.itinerary')->where('uid', $body['itinerary_uid'])->first();
-		if ($itinerary === null) {
 
-			//create error response
+		if ($itinerary === null) {
 			return response()->json([404]);
 		}
 
 		//check product id
-		$product= DB::table('transactions.products')->where('uid', $body['product_uid'])->first();
+		$product = Product::where('uid', $body['product_uid'])->first();
 
 		if ($product === null) {
-			//create error response
-			return response()->json([404]);
+			return response()->json(['message' => 'product not found'], 404);
 		}
 
-		//TODO: validate currency
 		$currency = Currency::isSupportedCurrency($product->currency);
 
 		if (!$currency) {
-			//create error response
-			return response()->json([400]);
+			return response()->json(['message' => 'currency not supported $curren'], 404);
 		}
-		//TODO: verify promo code
+
+		//format price
+		$formated_product_value = Gateway::normalizePrice($product->value, $product->currency);
+
+		$is_valid = Price::isValidPrice($body['value'], $formated_product_value);
+
+		if ($is_valid) {
+			Log::error('Invalid price, possible fraud attempt', ['request' => $body]);
+		}
 
 		$transaction = Transaction::create(
 			[
@@ -73,18 +77,17 @@ class TransactionsController extends Controller
 				'itinerary_id' => $itinerary->id,
 				'product_id' => $product->id,
 				'currency' => $product->currency,
-				'value' => $product->value / 1000, //TODO to ficx,
+				'value' => $formated_product_value,
 				'method' => $body['method'],
 				'gateway' => $body['gateway'],
 				'country' => $body['country'] ?? 'ZZ',
 				'promo_code' => $body['promo_code'] ?? null,
 				'metadata' => $body['metadata'] ?? [],
 				'status' => 'PENDING_PAYMENT'
-			]);
+			]
+    	);
 
-		$checkout_session = $gateway->executeCheckout($body['success_url'], $body['cancel_url'], $itinerary->id, $transaction, $itinerary->email);
-            $info = json_decode($itinerary->itinerary, true);
-        //Mail::to($itinerary->email)->send(new Email($info));
+		$checkout_session = $gateway->executeCheckout($body['success_url'], $body['cancel_url'], $itinerary->id, $transaction, $itinerary->email, $product);
 		return response()->json([
 			'uid' => $transaction->uid,
 			'status' => $transaction->status,
@@ -130,10 +133,10 @@ class TransactionsController extends Controller
 		if (!$transaction->isClosed()) {
 			if ($event->type == 'checkout.session.completed') {
 
-                if ($payment_intent_id === null) {
-                    Log::error('Invalid payment intent', ['request' => $session]);
-                    return response()->json(['error' => 'Invalid payment intent'], 400);
-                }
+				if ($payment_intent_id === null) {
+					Log::error('Invalid payment intent', ['request' => $session]);
+					return response()->json(['error' => 'Invalid payment intent'], 400);
+				}
 
 			   $notification = $gateway->getPaymentNotification($payment_intent_id);
 			   if ($transaction->gateway_reference === null) {
@@ -142,26 +145,26 @@ class TransactionsController extends Controller
 			   $transaction->status = Gateway::mapStripeStatusToInternalStatus($notification->status)->value;
 			   if ($transaction->status === 'COMPLETED') {
 				//fetch itinerary
-                    $itinerary = Itinerary::where('uid', $itinerary_uid)->first();
-				    if ($itinerary !== null && !$itinerary->isClosed()) {
-                        try {
-                            Mail::to($itinerary->email)->queue(new Email($itinerary->itinerary));
-                        } catch (\Exception $e) {
-                            $itinerary->status = 'FAILED';
-                            $itinerary->save();
-                            Log::error('Error sending email', ['error' => $e->getMessage()]);
-                            throw new \Exception('Error sending email');
-                        }
+					$itinerary = Itinerary::where('uid', $itinerary_uid)->first();
+					if ($itinerary !== null && !$itinerary->isClosed()) {
+						try {
+							Mail::to($itinerary->email)->queue(new Email($itinerary->itinerary));
+						} catch (\Exception $e) {
+							$itinerary->status = 'FAILED';
+							$itinerary->save();
+							Log::error('Error sending email', ['error' => $e->getMessage()]);
+							throw new \Exception('Error sending email');
+						}
 
-                        $itinerary->status = 'COMPLETED';
-                        $itinerary->save();
-                    }
-				    $transaction->save();
-                }
-            }
-	    }
+						$itinerary->status = 'COMPLETED';
+						$itinerary->save();
+					}
+				}
+                $transaction->save();
+			}
+		}
 
-        //return
-        return response()->json(['status' => 'success'], 200);
-    }
+		//return
+		return response()->json(['status' => 'success'], 200);
+	}
 }
