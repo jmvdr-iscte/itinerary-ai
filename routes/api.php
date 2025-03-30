@@ -14,6 +14,7 @@ Route::post('/itinerary', [ItineraryController::class, 'createItinerary']);
 
 Route::middleware('api_key')->group(function () {
     Route::post('/product', [ProductsController::class, 'createProduct']);
+    Route::patch('/product/{uid}', [ProductsController::class, 'updateProduct']);
 });
 
 Route::post('/transactions', [TransactionsController::class, 'createTransaction']);

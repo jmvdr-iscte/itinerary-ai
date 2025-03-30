@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\CreateProduct;
+use App\Http\Requests\UpdateProductRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Models\Product;
@@ -47,8 +48,14 @@ class ProductsController extends Controller
 
 
 
-	final public function updateProduct(string $uid, Request $request): JsonResponse
+	final public function updateProduct(string $uid, UpdateProductRequest $request): JsonResponse
 	{
-		return response()->json([]);
+        $body = $request->validated();
+        $product = Product::where('uid', $uid)
+            ->first();
+
+        $product->update($body);
+
+		return response()->json([], 204);
 	}
 }
