@@ -10,7 +10,6 @@ use App\Services\Maps;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use App\Services\Email;
-use Illuminate\Http\Request;
 
 class ServerController extends Controller
 {
@@ -20,45 +19,44 @@ class ServerController extends Controller
 		return response()->json(['status' => 'ok']);
 	}
 
-	final public function test(Request $request): JsonResponse
+	final public function test(ItineraryRequest $request): JsonResponse
 	{
-		//init
-		// $ai_service = new AIService();
-		// $maps_service = new Maps();
+		$ai_service = new AIService();
+		$maps_service = new Maps();
 
-		// $body = $request->validated();
+		$body = $request->validated();
 
-		// $itinerary = $ai_service->getItinerary(
-		// 	$body['from'],
-		// 	$body['to'],
-		// 	$body['destination'],
-		// 	$body['categories'],
-		// 	$body['transportation'],
-		// 	$body['number_of_people'],
-        //     $body['budget'],
-        //     $body['activity_pace'] ?? null,
-        //     $body['must_see_attractions'] ?? null
-		// );
+		$itinerary = $ai_service->getItinerary(
+			$body['from'],
+			$body['to'],
+			$body['destination'],
+			$body['categories'],
+			$body['transportation'],
+			$body['number_of_people'],
+            $body['budget'],
+            $body['activity_pace'] ?? null,
+            $body['must_see_attractions'] ?? null
+		);
 
-        // foreach ($itinerary as $day => $details) {
-        //     if (!isset($details['places']) || !is_array($details['places'])) {
-        //         Log::error('Invalid places.', $day, $details);
-        //         continue;
-        //     }
+        foreach ($itinerary as $day => $details) {
+            if (!isset($details['places']) || !is_array($details['places'])) {
+                Log::error('Invalid places.', $day, $details);
+                continue;
+            }
 
-        //     $addresses = array_map(function($place) {
-        //         return $place['address'];
-        //     }, $details['places']);
+            $addresses = array_map(function($place) {
+                return $place['address'];
+            }, $details['places']);
 
-        //     $itinerary[$day]['places'] = $maps_service->getRoutes($body['origin'], $addresses, $itinerary[$day]['transportation']);
-        // }
+            $itinerary[$day]['places'] = $maps_service->getRoutes($body['origin'], $addresses, $itinerary[$day]['transportation']);
+        }
 
-        // Mail::to($body['email'])->send(new Email($itinerary));
+        Mail::to($body['email'])->send(new Email($itinerary));
 
-        $region = Client::getClientRegion($request);
+       // $region = Client::getClientRegion($request);
 
 		return response()->json([
-            'region' => $region,
+            'reult' => $itinerary,
         ]);
 	}
 }

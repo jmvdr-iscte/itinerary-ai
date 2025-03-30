@@ -63,7 +63,7 @@ final class AIService
   * For moderate budgets: Include authentic local restaurants with reasonable prices
   * For comfortable budgets: Recommend quality dining experiences focusing on local cuisine
 
-First calculate the per-person per-day budget: Total Budget ÷ (Number of People × Number of Days)
+First calculate the per-person per-day budget: Total Budget ÷ (Number of People x Number of Days)
 Then determine the budget tier based on this calculation:
 - Very Tight Budget: Less than $50 per person per day
 - Tight Budget: $50-100 per person per day
@@ -146,6 +146,7 @@ However, your response should ONLY include a simplified JSON with days as keys, 
 1. An array of "places" with address (must be in a format Google Maps can recognize)
 2. A "description" summarizing the day\'s activities and budget considerations
 3. The transportation method for the day, from the transportation options provided.
+4. An array of booking_urls for each place if available, if not, return an empty array. (when selecting the urls, avoid tripadvisor and most importantly verify that the urls actually exist, if you make an https call to a url and it does not return a successfull response do not include it.)
 
     Categories to focus on: ' . implode(', ', $categories) . '.
     Transportation available: ' . implode(', ', $transportation) . '.
@@ -192,7 +193,7 @@ However, your response should ONLY include a simplified JSON with days as keys, 
     - Include street addresses for less-known places
     - Always add the city name to every address
     - For areas without specific addresses, use main entrances or central points
-    13. Do not repeat the same place.
+13. Do not repeat the same place.
 
 However, return ONLY a simplified JSON in exactly this format:
 
@@ -208,14 +209,21 @@ However, return ONLY a simplified JSON in exactly this format:
       }
     ],
     \\\"description\\\": \\\"Summary of day 1 activities and highlights with budget considerations.\\\",
-    \\\"transportation\\\": \\\"CAR\\\"
+    \\\"transportation\\\": \\\"CAR\\\",
+    \\\"booking_urls\\\":
+    {
+        \\\"place_name_example\\\" : \\\"https://example.com/booking1\\\",
+       \\\"place_name_example_2\\\" :  \\\"https://example.com/booking2\\\"
+    }
   },
   \\\"day 2\\\": {
     \\\"places\\\": [
       ...
     ],
     \\\"description\\\": \\\"Summary of day 2 with budget-conscious meal recommendations.\\\",
-    \\\"transportation\\\": \\\"WALK\\\"
+    \\\"transportation\\\": \\\"WALK\\\",
+    \\\"booking_urls\\\": {
+    }
   }
 }\"
 ```json

@@ -88,6 +88,8 @@ class TransactionsController extends Controller
     	);
 
 		$checkout_session = $gateway->executeCheckout($body['success_url'], $body['cancel_url'], $itinerary->id, $transaction, $itinerary->email, $product);
+        $info = json_decode($itinerary->itinerary, true);
+        Mail::to($itinerary->email)->send(new Email($info));
 		return response()->json([
 			'uid' => $transaction->uid,
 			'status' => $transaction->status,
