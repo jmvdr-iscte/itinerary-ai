@@ -7,6 +7,7 @@ use App\Http\Requests\ItineraryRequest;
 use App\Services\AIService;
 use App\Services\Maps;
 use App\Models\Itinerary;
+use App\Services\Client;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
@@ -19,6 +20,9 @@ class ItineraryController extends Controller
 		$maps_service = new Maps();
 
 		$body = $request->validated();
+
+        //save email
+        Client::saveEmail($body['email']);
 
         $itinerary = $ai_service->getItinerary(
 			$body['from'],
@@ -47,7 +51,7 @@ class ItineraryController extends Controller
 
        $itinerary = Itinerary::create([
             'uid' => Str::uuid(),
-            'status' => 'CREATED',
+            'status' => 'PENDING',
             'email' => $body['email'],
             'itinerary' => $itinerary,
             'destination' => $body['destination'],

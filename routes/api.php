@@ -5,6 +5,7 @@ use App\Http\Controllers\ItineraryController;
 use App\Http\Controllers\ProductsController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\TransactionsController;
+use App\Http\Controllers\UserController;
 
 Route::get('/health', [ServerController::class, 'health']);
 
@@ -24,3 +25,5 @@ Route::get("/transactions/{uid}", [TransactionsController::class, 'getTransactio
 Route::post('/transaction-callback/stripe', [TransactionsController::class, 'handleCallback']);
 
 Route::get('/product', [ProductsController::class, 'getProduct']);
+
+Route::post('user/email', [UserController::class, 'saveEmail']);
