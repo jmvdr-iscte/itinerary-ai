@@ -6,7 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="color-scheme" content="light">
     <meta name="supported-color-schemes" content="light">
-    <title>Your TripFlow Vacation Itinerary</title>
+    <title>Your SeemlessTrip Vacation Itinerary</title>
     <!--[if !mso]><!-->
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <!--<![endif]-->
@@ -539,7 +539,7 @@
                   </g>
 
                   <!-- Text -->
-                  <text x="90" y="45" class="logo-text" font-size="28">TripFlow</text>
+                  <text x="90" y="45" class="logo-text" font-size="28">SeemlessTrip</text>
                 </svg>
                 <!--<![endif]-->
 
@@ -548,7 +548,7 @@
                 <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
                 <tr>
                 <td align="center">
-                    <img src="https://i.imgur.com/placeholder-for-tripflow-logo.png" alt="TripFlow" width="240" style="width: 240px; max-width: 240px; height: auto; display: block; margin: 0 auto;">
+                    <img src="https://i.imgur.com/placeholder-for-tripflow-logo.png" alt="SeemlessTrip" width="240" style="width: 240px; max-width: 240px; height: auto; display: block; margin: 0 auto;">
                 </td>
                 </tr>
                 </table>
@@ -728,8 +728,8 @@
                 </a>
             </div>
             <p>Have questions about your itinerary? <a href="mailto:support@tripflow.ai" class="contact-link">Contact us</a></p>
-            <p>Powered by <span class="brand-highlight">TripFlow AI</span></p>
-            <p class="copyright">© {{ date('Y') }} TripFlow AI. All rights reserved.</p>
+            <p>Powered by <span class="brand-highlight">SeemlessTrip</span></p>
+            <p class="copyright">© {{ date('Y') }} SeemlessTrip. All rights reserved.</p>
         </div>
     </div>
 
