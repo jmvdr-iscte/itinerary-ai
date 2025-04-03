@@ -4,12 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\JsonResponse;
 use App\Http\Requests\SaveEmailRequest;
-use App\Services\AIService;
-use App\Services\Maps;
-use App\Models\Itinerary;
+use App\Http\Requests\SupportUserRequest;
 use App\Services\Client;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Str;
 
 class UserController extends Controller
 {
@@ -25,6 +21,16 @@ class UserController extends Controller
     final public function saveEmail(SaveEmailRequest $request): JsonResponse
     {
         Client::saveEmail($request->validated('email'));
+
+        //return
+        return response()->json([], 201);
+    }
+
+
+    final public function supportUser(SupportUserRequest $request): JsonResponse
+    {
+        $body = $request->validated();
+        Client::saveSupport($body['email'], $body['content'], $body['name'], $body['title'] ?? null);
 
         //return
         return response()->json([], 201);

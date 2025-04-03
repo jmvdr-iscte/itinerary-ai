@@ -70,4 +70,14 @@ final class Client
             [$email, Str::uuid()]
 		);
 	}
+
+
+    final public static function saveSupport(string $email, string $content, string $name, ?string $title = null): void
+    {
+        DB::insert(
+            "INSERT INTO users.support (email, content, name, title, created_at, updated_at)
+                VALUES (?, ?, ?, ?, NOW(), NOW())",
+            [$email, $content, $name, $title]
+        );
+    }
 }

@@ -27,3 +27,5 @@ Route::post('/transaction-callback/stripe', [TransactionsController::class, 'han
 Route::get('/product', [ProductsController::class, 'getProduct']);
 
 Route::post('user/email', [UserController::class, 'saveEmail']);
+
+Route::post('user/support', [UserController::class, 'supportUser']);
