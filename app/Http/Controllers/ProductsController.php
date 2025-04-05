@@ -22,6 +22,7 @@ class ProductsController extends Controller
             'name' => $body['name'],
             'value' => $body['value'],
             'currency' => $body['currency'],
+            'symbol' => $body['symbol'],
             'status' => 'ACTIVE'
         ]);
 

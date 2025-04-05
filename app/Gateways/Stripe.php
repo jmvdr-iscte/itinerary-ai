@@ -84,6 +84,7 @@ final class Stripe
                 ],
             ],
             'mode' => 'payment',
+            'allow_promotion_codes' => true,
             'metadata' => [
                 'transaction_id' => $transaction->id,
                 'ititnerary_id' => $itinerary_id,

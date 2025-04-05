@@ -24,7 +24,8 @@ class CreateProduct extends FormRequest
         return [
             'name' => ['required', 'string'],
             'value' => ['required', 'integer'],
-            'currency' => ['required', 'string']
+            'currency' => ['required', 'string'],
+            'symbol' => ['required', 'string']
         ];
     }
 }

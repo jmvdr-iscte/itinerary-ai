@@ -17,6 +17,7 @@ use App\Services\Email;
 use App\Models\Itinerary;
 use App\Utils\Price;
 use App\Models\Product;
+use Illuminate\Support\Facades\Cache;
 
 class TransactionsController extends Controller
 {
@@ -37,6 +38,17 @@ class TransactionsController extends Controller
 	   return response()->json($transaction->makeHidden(['id', 'itinerary_id', 'product_id', 'promo_code', 'gateway_reference']));
 	}
 
+	final public function getTransactionCount(): JsonResponse
+	{
+        $count = Cache::remember('transaction_count_recent_completed', 60, function () {
+            return Transaction::where('status', 'COMPLETED')
+                ->where('created_at', '>=', now()->subDay())
+                ->count();
+        });
+
+		return response()->json(['count' => $count]);
+	}
+
 	final public function createTransaction(CreateTransactionRequest $request): JsonResponse
 	{
 		$gateway = new Gateway();
@@ -46,8 +58,12 @@ class TransactionsController extends Controller
 		$itinerary = DB::table('itinerary.itinerary')->where('uid', $body['itinerary_uid'])->first();
 
 		if ($itinerary === null) {
-			return response()->json([404]);
+			return response()->json(['message' => 'itinerary not found'], 404);
 		}
+
+        if (in_array($itinerary->status, ['CANCELED', 'FAILED', 'COMPLETED'], true)) {
+			return response()->json(['message' => 'itinerary is already closed'], 400);
+        }
 
 		//check product id
 		$product = Product::where('uid', $body['product_uid'])->first();
@@ -59,7 +75,7 @@ class TransactionsController extends Controller
 		$currency = Currency::isSupportedCurrency($product->currency);
 
 		if (!$currency) {
-			return response()->json(['message' => 'currency not supported $curren'], 404);
+			return response()->json(['message' => "$currency not supported"], 404);
 		}
 
 		//format price
@@ -85,11 +101,11 @@ class TransactionsController extends Controller
 				'metadata' => $body['metadata'] ?? [],
 				'status' => 'PENDING_PAYMENT'
 			]
-    	);
+		);
 
 		$checkout_session = $gateway->executeCheckout($body['success_url'], $body['cancel_url'], $itinerary->id, $transaction, $itinerary->email, $product);
-        $info = json_decode($itinerary->itinerary, true);
-        Mail::to($itinerary->email)->send(new Email($info));
+		$info = json_decode($itinerary->itinerary, true);
+		//Mail::to($itinerary->email)->send(new Email($info));
 		return response()->json([
 			'uid' => $transaction->uid,
 			'status' => $transaction->status,
@@ -162,7 +178,7 @@ class TransactionsController extends Controller
 						$itinerary->save();
 					}
 				}
-                $transaction->save();
+				$transaction->save();
 			}
 		}
 
